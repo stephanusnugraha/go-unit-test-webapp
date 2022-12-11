@@ -1,0 +1,10 @@
+# tmp folder
+tmp/
+
+.idea
+.air.toml
+Makefile
+dist/
+.vscode
+database.yml
+docker-compose.yml
