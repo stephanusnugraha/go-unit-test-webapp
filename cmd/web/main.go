@@ -2,11 +2,10 @@ package main
 
 import (
 	"flag"
+	"github.com/alexedwards/scs/v2"
 	"go-unit-test-webapp/pkg/db"
 	"log"
 	"net/http"
-
-	"github.com/alexedwards/scs/v2"
 )
 
 type application struct {
@@ -25,6 +24,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer conn.Close()
 
 	app.DB = db.PostgresConn{DB: conn}
 
