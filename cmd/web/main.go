@@ -1,8 +1,8 @@
 package main
 
 import (
-	"database/sql"
 	"flag"
+	"go-unit-test-webapp/pkg/db"
 	"log"
 	"net/http"
 
@@ -12,7 +12,7 @@ import (
 type application struct {
 	Session *scs.SessionManager
 	DSN     string
-	DB      *sql.DB
+	DB      db.PostgresConn
 }
 
 func main() {
@@ -26,7 +26,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	app.DB = conn
+	app.DB = db.PostgresConn{DB: conn}
 
 	// get a session manager
 	app.Session = getSession()
