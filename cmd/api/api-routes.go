@@ -19,7 +19,7 @@ func (app *application) routes() http.Handler {
 
 	// protected routes
 	mux.Route("/users", func(r chi.Router) {
-		mux.Use(app.authRequired)
+		r.Use(app.authRequired)
 
 		r.Get("/", app.allUsers)
 		r.Get("/{userID}", app.getUser)
