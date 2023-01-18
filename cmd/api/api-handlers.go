@@ -2,8 +2,11 @@ package main
 
 import (
 	"errors"
+	"github.com/go-chi/chi/v5"
 	"github.com/golang-jwt/jwt/v4"
+	"go-unit-test-webapp/pkg/data"
 	"golang.org/x/crypto/bcrypt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -108,21 +111,83 @@ func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) allUsers(w http.ResponseWriter, r *http.Request) {
+	users, err := app.DB.AllUsers()
+	if err != nil {
+		app.errorJSON(w, err, http.StatusBadRequest)
+		return
+	}
 
+	err = app.writeJSON(w, http.StatusOK, users)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 }
 
 func (app *application) getUser(w http.ResponseWriter, r *http.Request) {
+	userID, err := strconv.Atoi(chi.URLParam(r, "userID"))
+	if err != nil {
+		app.errorJSON(w, err, http.StatusBadRequest)
+		return
+	}
 
+	user, err := app.DB.GetUser(userID)
+	if err != nil {
+		return
+	}
+
+	err = app.writeJSON(w, http.StatusOK, user)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 }
 
 func (app *application) updateUser(w http.ResponseWriter, r *http.Request) {
+	var user data.User
+	err := app.readJSON(w, r, &user)
+	if err != nil {
+		app.errorJSON(w, err, http.StatusBadRequest)
+		return
+	}
 
+	err = app.DB.UpdateUser(user)
+	if err != nil {
+		app.errorJSON(w, err, http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (app *application) deleteUser(w http.ResponseWriter, r *http.Request) {
+	userID, err := strconv.Atoi(chi.URLParam(r, "userID"))
+	if err != nil {
+		app.errorJSON(w, err, http.StatusBadRequest)
+		return
+	}
 
+	err = app.DB.DeleteUser(userID)
+	if err != nil {
+		app.errorJSON(w, err, http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (app *application) insertUser(w http.ResponseWriter, r *http.Request) {
+	var user data.User
+	err := app.readJSON(w, r, &user)
+	if err != nil {
+		app.errorJSON(w, err, http.StatusBadRequest)
+		return
+	}
 
+	_, err = app.DB.InsertUser(user)
+	if err != nil {
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
